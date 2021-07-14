@@ -242,3 +242,54 @@ then you can get
 and check 127.0.0.1/[your port]/docs.   
 
 you can try this here.
+
+## POST JSON Object with java code
+
+```java
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+ 
+public class mainClass {
+
+	public static void main(String[] args) throws Exception {
+		sendPostJson();
+	}
+
+	public static void sendPostJson() throws Exception{
+		URL url = new URL("http://127.0.0.1:8000/items/");
+		
+		HttpURLConnection con = (HttpURLConnection)url.openConnection();
+		con.setRequestMethod("POST");
+		con.setRequestProperty("Content-Type", "application/json");
+		con.setRequestProperty("Accept", "application/json");
+		con.setDoOutput(true);
+		
+		String jsonInputString = "{\"name\": \"foo\",  \"description\": \"foo\", \"price\": 30,  \"tax\": 40}";
+		
+		try(OutputStream os = con.getOutputStream()){
+			byte[] input = jsonInputString.getBytes("utf-8");
+			os.write(input,0,input.length);
+		}
+		
+		try(BufferedReader br = new BufferedReader(
+				new InputStreamReader(con.getInputStream(),"utf-8"))){
+			StringBuilder response = new StringBuilder();
+			String responseLine = null;
+			while((responseLine = br.readLine())!=null) {
+				response.append(responseLine.trim());
+			}
+			System.out.println(response.toString());
+		}
+		
+	}
+}
+```
+
+then you can check at console
